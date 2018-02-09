@@ -1,0 +1,253 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+	<title></title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" href="/css/main.css" />
+	<script src="/js/sockjs.min.js"></script>
+    <script src="/js/stomp.js"></script>
+	<script src="/js/jquery-1.12.4.min.js"></script>
+	<script src="/js/view.js"></script>
+	<style>
+	#TextArea1 {
+            height: 232px;
+            width: 334px;
+        }
+	</style>
+</head>
+
+<body onunload="logout()">  
+	<OBJECT ID="MdControl" CLASSID="CLSID:755891AC-BA4D-471E-84E1-2AE7031CC943"></OBJECT>
+	<table style="width: 54%; table-layout: fixed; position: absolute; top: 20px; left: 607px; height: 477px;">
+        <tr>
+            <td class="auto-style3">用户名</td>
+            <td style="background-repeat: inherit" class="auto-style2">
+                <input id="Text1" type="text" value="5000" /></td>
+        </tr>
+        <tr>
+            <td class="auto-style4">密码</td>
+            <td class="auto-style1" style="background-repeat: inherit">
+                <input id="Text2" type="text" value="5000" /></td>
+        </tr>
+        <tr>
+            <td class="auto-style5">服务器IP</td>
+            <td style="background-repeat: inherit" class="auto-style6">
+                <input id="Text3" type="text" value="10.1.0.50" /></td>
+        </tr>
+        <tr>
+            <td class="auto-style5">本地IP</td>
+            <td style="background-repeat: inherit" class="auto-style6">
+                <input id="Text4" type="text" value="192.168.50.171" /></td>
+        </tr>
+        <tr>
+            <td class="auto-style9">许可证</td>
+            <td style="background-repeat: inherit" class="auto-style8">
+                <input id="Text5" aria-multiline="True" aria-multiselectable="True" type="text" value="47B35AC2E344B4E9F3894E8BCD4D115A" /></td>
+        </tr>
+        <tr>
+            <td class="auto-style7" colspan="2">
+                <br />
+                <hr />
+                	呼叫号码 <input id="Text6" type="text" value="1104" /><br />
+                <br />
+                <input id="Button6" type="button" value="语音呼叫" onclick="return Button6_onclick()"/>&nbsp;
+                <input id="Button7" type="button" value="挂断" onclick="hangup()"/>&nbsp;
+        	</td>
+        </tr>
+    </table>
+    电话列表<br />
+    <table border="1">  
+              <tr>  
+                <th>话机</th>    
+              </tr>  
+              <tr th:each="p : ${pager}">  
+                <td th:text="${p.name}">${p.phone}</td>    
+              </tr>  
+            </table>
+    话机状态及线路状态<br />
+
+    <textarea id="TextArea1" name="S1" cols="20" rows="1" title="话机及线路状态" aria-readonly="True">
+
+    </textarea>
+        <div style="height: 16px; width: 287px">
+        <input id="Button53" type="button" value="线路1" onclick="return Button54_onclick()"/>
+        <input id="Button54" type="button" value="线路2" onclick="return Button55_onclick()"/>
+        <input id="Button55" type="button" value="线路3" onclick="return Button56_onclick()"/>
+        <input id="Button56" type="button" value="线路4" onclick="return Button57_onclick()"/>
+    </div>
+</body>
+<script src="/js/jquery-1.12.4.min.js"></script>
+<script src="/js/view.js"></script>
+<script type="text/javascript" for="MdControl" event="onPhoneState(nState)">
+    {
+        //S1.value += "话机状态" + nState + "\n";
+        S1.value += "phone 状态" + nState + "\n";
+        if (nState == 2) {
+            // 设置线路
+            //MdControl.setActiveLine(0);
+
+            var nline = MdControl.getActiveLine();
+            S1.value += "话机注册成功\n设置线路" + nline + "为当前线路 \n";
+            //alert(5555555);
+        }
+        else if (nState == 0 ||
+            nState == 3) {
+            S1.value += "话机没注册 \n";
+        }
+    }
+</script>
+
+<script type="text/javascript" for="MdControl" event="onLineState(nLine,nState,nMediaType)">
+    {
+        S1.value += "线路号" + nLine + ":状态" + nState + ":媒体类型" + nMediaType + "\n";
+        //alert(Text6.value);
+
+        var szNumber = MdControl.getPeerNumber(nLine);
+        szNumber += "媒体类型:"+MdControl.getMediaType(nLine);
+
+        var strText;
+        if (nState == 0) {
+            strText = "空闲";
+            if (nLine == 0) {
+                Button53.style.background = "#ffffff";
+            }
+            else if (nLine == 1) {
+                Button54.style.background = "#ffffff";
+            }
+            else if (nLine == 2) {
+                Button55.style.background = "#ffffff";
+            }
+            else if (nLine == 3) {
+                Button56.style.background = "#ffffff";
+            }
+
+            var nLine1 = MdControl.getActiveLine();
+            if (nLine1 == 0) {
+                Button53.style.background = "#f48282";
+                /*
+                Button54.style.background = "#ffffff";
+                Button55.style.background = "#ffffff";
+                Button56.style.background = "#ffffff";
+                */
+            }
+            else if (nLine1 == 1) {
+                Button54.style.background = "#f48282";
+                /*
+                Button54.style.background = "#ffffff";
+                Button55.style.background = "#ffffff";
+                Button56.style.background = "#ffffff";
+                */
+            }
+            else if (nLine1 == 2) {
+                Button55.style.background = "#f48282";
+            }
+            else if (nLine1 == 3) {
+                Button56.style.background = "#f48282";
+            }
+
+
+        }
+        // 来电
+        else if (nState == 1) {
+            //MdControl.GetRemoteNumber(0, szNumber.trim());
+            //alert("来电");
+            strText = "振铃";
+            strText += "=>";
+
+            //var oStringObject = MdControl.GetRemoteNumber(nLine);
+            //alert(oStringObject);
+
+            strText += szNumber;
+
+
+            if (nLine == 0)
+            {
+                Button53.style.background = "#4cb5f7";
+            }
+            else if(nLine == 1)
+            {
+                Button54.style.background = "#4cb5f7";
+            }
+            else if(nLine == 2)
+            {
+                Button55.style.background = "#4cb5f7";
+            }
+            else if (nLine == 3)
+            {
+                Button56.style.background = "#4cb5f7";
+            }
+        }
+        else if (nState == 2) {
+            //alert("等待回铃");
+            strText = "等待回铃";
+            strText += "=>";
+            strText += szNumber;
+        }
+        else if (nState == 3) {
+            //alert("回铃");
+            strText = "回铃";
+            strText += "=>";
+            strText += szNumber;
+        }
+        else if (nState == 4) {
+            //alert("通话");
+            strText = "通话";
+            strText += "=>";
+            strText += szNumber;
+
+
+            var b = MdControl.setVideoWindow(0, VideoWindow1.GetWindow());
+            var b = MdControl.setVideoWindow(1, VideoWindow2.GetWindow());
+            var b = MdControl.setVideoWindow(2, VideoWindow3.GetWindow());
+            var b = MdControl.setVideoWindow(3, VideoWindow4.GetWindow());
+
+        }
+        else if (nState == 5) {
+            strText = "保持";
+            strText += "=>";
+            strText += szNumber;
+        }
+        S1.value += strText + "\n";
+        
+        if (nLine == 0)
+        {
+            VideoWindow1.refreshWindow();
+        }
+        else if(nLine == 1)
+        {
+            VideoWindow2.refreshWindow();
+        }
+        else if(nLine == 2)
+        {
+            VideoWindow3.refreshWindow();
+        }
+        else if (nLine == 3)
+        {
+            VideoWindow4.refreshWindow();
+        }
+    }
+</script>
+<script type="text/javascript">
+	function connect() {
+		var socket = new SockJS('/endpointSang');
+		stompClient = Stomp.over(socket);
+		stompClient.connect({}, function(frame) {
+			console.log('Connected:' + frame);
+			stompClient.subscribe('/topic/getResponse', function(response) {
+				alert(response.body);
+				if(response.body==-1){
+					hangup();
+					//alert("挂断");
+				}else{
+					call(response.body);
+					//alert("拨打"+response.body);
+				}
+			})
+		});
+	}
+	$(function() {
+		load();
+		connect();
+	});
+</script>
+</html>
